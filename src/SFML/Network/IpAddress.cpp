@@ -31,6 +31,10 @@
 #include <cstring>
 #include <utility>
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4996)
+#endif
 
 namespace sf
 {
@@ -271,3 +275,7 @@ std::ostream& operator <<(std::ostream& stream, const IpAddress& address)
 }
 
 } // namespace sf
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif

@@ -43,7 +43,15 @@ namespace
     bool isWindowsXpOrOlder()
     {
         // Windows XP was the last 5.x version of Windows
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4996)
+#endif
         return static_cast<DWORD>(LOBYTE(LOWORD(GetVersion()))) < 6;
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
     }
 }
 

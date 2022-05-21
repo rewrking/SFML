@@ -280,11 +280,15 @@ Socket::Status TcpSocket::receive(void* data, std::size_t size, std::size_t& rec
         return Error;
     }
 
+#if defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
     // Receive a chunk of bytes
     int sizeReceived = static_cast<int>(recv(getHandle(), static_cast<char*>(data), static_cast<priv::SocketImpl::Size>(size), flags));
+#if defined(__GNUC__)
     #pragma GCC diagnostic pop
+#endif
 
     // Check the number of bytes received
     if (sizeReceived > 0)

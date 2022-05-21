@@ -66,7 +66,14 @@ bool FileInputStream::open(const std::string& filename)
     if (m_file)
         std::fclose(m_file);
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4996)
+#endif
     m_file = std::fopen(filename.c_str(), "rb");
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
     return m_file != NULL;
 #endif
