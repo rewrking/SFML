@@ -28,6 +28,7 @@
 ////////////////////////////////////////////////////////////
 #include <SFML/Window/OSX/AutoreleasePoolWrapper.hpp>
 #include <SFML/Window/OSX/WindowImplCocoa.hpp>
+#include <SFML/Window/CursorImpl.hpp>
 #include <SFML/System/Err.hpp>
 
 #import <SFML/Window/OSX/cpp_objc_conversion.h>
@@ -504,10 +505,10 @@ void WindowImplCocoa::setMouseCursorGrabbed(bool grabbed)
 
 
 ////////////////////////////////////////////////////////////
-void WindowImplCocoa::setMouseCursor(const CursorImpl& cursor)
+void WindowImplCocoa::setMouseCursor(const Cursor& cursor)
 {
     AutoreleasePool pool;
-    [m_delegate setCursor:cursor.m_cursor];
+    [m_delegate setCursor:cursor.getImpl().m_cursor];
 }
 
 

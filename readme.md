@@ -37,3 +37,38 @@ There are several places to learn SFML:
 ## Contribute
 
 SFML is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the [contribution guidelines](https://www.sfml-dev.org/contribute.php).
+
+## Branch Notes:
+
+Exposes `sf::priv::WindowImpl` so that one could use a separate library for window/events (SDL2 or GLFW). Keep in mind, this also disables SFML events entirely, so don't attempt to use them. Build using cmake with `SFML_CUSTOM_WINDOW=ON`, write a class that implements `sf::priv::WindowImpl`, and create the window with something like:
+
+```cpp
+// GameWindow extends sf::RenderWindow
+void GameWindow::createWindowImpl(const bool inFullscreen, const sf::Uint32 inStyle)
+{
+    if (m_windowImpl != nullptr)
+        return;
+
+    sf::VideoMode mode;
+    mode.width = m_windowResolution.x;
+    mode.height = m_windowResolution.y;
+
+    m_windowImpl = new SDLWindowImpl(mode, m_title, inStyle, m_contextSettings);
+	
+    // Use SDL_WINDOW_OPENGL flag w/ SDL_GL_SetAttribute, 
+    // but do not create a SDL_Renderer (done by SFML)
+
+    // m_windowImpl is injected here, so it will get deleted by SFML. Keeping a 
+    // weak pointer is useful for calling implementation-specific things that 
+    // aren't required by sf::priv::WindowImpl, like "setFullscreen". For example, 
+    // GameWindow shouldn't make any calls directly to SDL2
+    this->create(m_windowImpl, inFullscreen, mode, m_contextSettings);
+
+    // This just calls SDL_GL_GetAttribute() to make sure the context is what 
+    // is expected, but granted, you could do this however you like
+    m_windowImpl->checkContext(); 
+}
+```
+For SDL2, also make sure the window uses OpenGL exclusively, and everything initializes & destructs correctly. Write out your event handling somewhere (especially for SDL_WINDOWEVENT_CLOSE), otherwise you won't be able to do much. Take advantage of SDL_GameController and SDL_Haptic of course! That and dual-monitor support / more robust window handling are the primary reasons for doing something like this.
+
+The setup is similar for GLFW, but you'll need to create the glfw callbacks that statically call your own event dispatcher.

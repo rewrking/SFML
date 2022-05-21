@@ -39,10 +39,12 @@ const Transform Transform::Identity;
 Transform::Transform()
 {
     // Identity matrix
-    m_matrix[0] = 1.f; m_matrix[4] = 0.f; m_matrix[8]  = 0.f; m_matrix[12] = 0.f;
-    m_matrix[1] = 0.f; m_matrix[5] = 1.f; m_matrix[9]  = 0.f; m_matrix[13] = 0.f;
-    m_matrix[2] = 0.f; m_matrix[6] = 0.f; m_matrix[10] = 1.f; m_matrix[14] = 0.f;
-    m_matrix[3] = 0.f; m_matrix[7] = 0.f; m_matrix[11] = 0.f; m_matrix[15] = 1.f;
+    m_matrix = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f,
+    };
 }
 
 
@@ -51,15 +53,31 @@ Transform::Transform(float a00, float a01, float a02,
                      float a10, float a11, float a12,
                      float a20, float a21, float a22)
 {
-    m_matrix[0] = a00; m_matrix[4] = a01; m_matrix[8]  = 0.f; m_matrix[12] = a02;
-    m_matrix[1] = a10; m_matrix[5] = a11; m_matrix[9]  = 0.f; m_matrix[13] = a12;
-    m_matrix[2] = 0.f; m_matrix[6] = 0.f; m_matrix[10] = 1.f; m_matrix[14] = 0.f;
-    m_matrix[3] = a20; m_matrix[7] = a21; m_matrix[11] = 0.f; m_matrix[15] = a22;
+    m_matrix = {
+        a00,  a10,  0.0f, a20,
+        a01,  a11,  0.0f, a21,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        a02,  a12,  0.0f, a22,
+    };
 }
 
+////////////////////////////////////////////////////////////
+void Transform::setMatrix(const Matrix4x4& inValue)
+{
+    m_matrix = inValue;
+}
 
 ////////////////////////////////////////////////////////////
-const float* Transform::getMatrix() const
+void Transform::setMatrix(const float* inValue)
+{
+    for (std::size_t i= 0; i< m_matrix.size(); ++i)
+    {
+        m_matrix[i] = inValue[i];
+    }
+}
+
+////////////////////////////////////////////////////////////
+const Transform::Matrix4x4& Transform::getMatrix() const
 {
     return m_matrix;
 }
@@ -101,11 +119,27 @@ Vector2f Transform::transformPoint(float x, float y) const
                     m_matrix[1] * x + m_matrix[5] * y + m_matrix[13]);
 }
 
+////////////////////////////////////////////////////////////
+Vector3f Transform::transformPoint(float x, float y, float z) const
+{
+    return Vector3f(m_matrix[0] * x + m_matrix[4] * y + m_matrix[8]  * z + m_matrix[12],
+                    m_matrix[1] * x + m_matrix[5] * y + m_matrix[9]  * z + m_matrix[13],
+                    m_matrix[2] * x + m_matrix[6] * y + m_matrix[10] * z + m_matrix[14]);
+}
 
 ////////////////////////////////////////////////////////////
 Vector2f Transform::transformPoint(const Vector2f& point) const
 {
-    return transformPoint(point.x, point.y);
+    return Vector2f(m_matrix[0] * point.x + m_matrix[4] * point.y + m_matrix[12],
+                    m_matrix[1] * point.x + m_matrix[5] * point.y + m_matrix[13]);
+}
+
+////////////////////////////////////////////////////////////
+Vector3f Transform::transformPoint(const Vector3f& point) const
+{
+    return Vector3f(m_matrix[0] * point.x + m_matrix[4] * point.y + m_matrix[8]  * point.z + m_matrix[12],
+                    m_matrix[1] * point.x + m_matrix[5] * point.y + m_matrix[9]  * point.z + m_matrix[13],
+                    m_matrix[2] * point.x + m_matrix[6] * point.y + m_matrix[10] * point.z + m_matrix[14]);
 }
 
 
@@ -113,8 +147,7 @@ Vector2f Transform::transformPoint(const Vector2f& point) const
 FloatRect Transform::transformRect(const FloatRect& rectangle) const
 {
     // Transform the 4 corners of the rectangle
-    const Vector2f points[] =
-    {
+    const std::array<Vector2f, 4> points = {
         transformPoint(rectangle.left, rectangle.top),
         transformPoint(rectangle.left, rectangle.top + rectangle.height),
         transformPoint(rectangle.left + rectangle.width, rectangle.top),
@@ -141,8 +174,8 @@ FloatRect Transform::transformRect(const FloatRect& rectangle) const
 ////////////////////////////////////////////////////////////
 Transform& Transform::combine(const Transform& transform)
 {
-    const float* a = m_matrix;
-    const float* b = transform.m_matrix;
+    const auto& a = m_matrix;
+    const auto& b = transform.m_matrix;
 
     *this = Transform(a[0] * b[0]  + a[4] * b[1]  + a[12] * b[3],
                       a[0] * b[4]  + a[4] * b[5]  + a[12] * b[7],
@@ -173,6 +206,14 @@ Transform& Transform::translate(float x, float y)
 Transform& Transform::translate(const Vector2f& offset)
 {
     return translate(offset.x, offset.y);
+}
+
+Transform& Transform::floorTranslation()
+{
+    m_matrix[12] = static_cast<float>(static_cast<int>(m_matrix[12]));
+    m_matrix[13] = static_cast<float>(static_cast<int>(m_matrix[13]));
+
+    return *this;
 }
 
 
@@ -269,12 +310,18 @@ Vector2f operator *(const Transform& left, const Vector2f& right)
     return left.transformPoint(right);
 }
 
+////////////////////////////////////////////////////////////
+Vector3f operator *(const Transform& left, const Vector3f& right)
+{
+    return left.transformPoint(right);
+}
+
 
 ////////////////////////////////////////////////////////////
 bool operator ==(const Transform& left, const Transform& right)
 {
-    const float* a = left.getMatrix();
-    const float* b = right.getMatrix();
+    const auto& a = left.getMatrix();
+    const auto& b = right.getMatrix();
 
     return ((a[0]  == b[0])  && (a[1]  == b[1])  && (a[3]  == b[3]) &&
             (a[4]  == b[4])  && (a[5]  == b[5])  && (a[7]  == b[7]) &&

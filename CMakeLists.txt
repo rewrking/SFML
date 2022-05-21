@@ -213,6 +213,10 @@ if(SFML_OPENGL_ES)
     add_definitions(-DGL_GLEXT_PROTOTYPES)
 endif()
 
+if(SFML_CUSTOM_WINDOW)
+    add_definitions(-DSFML_CUSTOM_WINDOW)
+endif()
+
 # define an option for choosing between static and dynamic C runtime (Windows only)
 if(SFML_OS_WINDOWS)
     sfml_set_option(SFML_USE_STATIC_STD_LIBS FALSE BOOL "TRUE to statically link to the standard libraries, FALSE to use them as DLLs")

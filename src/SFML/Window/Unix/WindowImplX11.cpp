@@ -29,6 +29,7 @@
 #include <SFML/Window/Unix/ClipboardImpl.hpp>
 #include <SFML/Window/Unix/Display.hpp>
 #include <SFML/Window/Unix/InputImpl.hpp>
+#include <SFML/Window/CursorImpl.hpp>
 #include <SFML/System/Utf.hpp>
 #include <SFML/System/Err.hpp>
 #include <SFML/System/Mutex.hpp>
@@ -1137,9 +1138,9 @@ void WindowImplX11::setMouseCursorVisible(bool visible)
 
 
 ////////////////////////////////////////////////////////////
-void WindowImplX11::setMouseCursor(const CursorImpl& cursor)
+void WindowImplX11::setMouseCursor(const Cursor& cursor)
 {
-    m_lastCursor = cursor.m_cursor;
+    m_lastCursor = cursor.getImpl().m_cursor;
     XDefineCursor(m_display, m_window, m_lastCursor);
     XFlush(m_display);
 }

@@ -44,6 +44,9 @@
 #include <SFML/Window/Window.hpp>
 #include <SFML/Window/WindowHandle.hpp>
 #include <SFML/Window/WindowStyle.hpp>
+#ifdef SFML_CUSTOM_WINDOW
+	#include <SFML/Window/WindowImpl.hpp>
+#endif
 
 
 

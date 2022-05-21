@@ -73,8 +73,13 @@ m_window(0)
     createContext(shared, bitsPerPixel, settings);
 
     // Apply context.
+#ifndef SFML_CUSTOM_WINDOW
     const WindowImplCocoa* ownerCocoa = static_cast<const WindowImplCocoa*>(owner);
     ownerCocoa->applyContext(m_context);
+#else
+    NSWindow* window = static_cast<NSWindow*>(owner->getSystemHandle());
+	[m_context setView:[window contentView]];
+#endif
 }
 
 

@@ -251,6 +251,14 @@ public:
     SoundSource& operator =(const SoundSource& right);
 
     ////////////////////////////////////////////////////////////
+    /// \brief Get the OpenAL source identifier
+    ///
+    /// \return The OpenAL source identifier for the sound
+    ///
+    ////////////////////////////////////////////////////////////
+    unsigned int getSource() const noexcept;
+
+    ////////////////////////////////////////////////////////////
     /// \brief Start or resume playing the sound source
     ///
     /// This function starts the source if it was stopped, resumes
@@ -292,6 +300,126 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual Status getStatus() const;
+
+public:
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the pitch of a sound given the OpenAL source identifier
+    ///
+    /// The pitch represents the perceived fundamental frequency
+    /// of a sound; thus you can make a sound more acute or grave
+    /// by changing its pitch. A side effect of changing the pitch
+    /// is to modify the playing speed of the sound as well.
+    /// The default value for the pitch is 1.
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param pitch New pitch to apply to the sound
+    ///
+    /// \see getPitch
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourcePitch(const unsigned int source, const float pitch);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the volume of a sound given the OpenAL source identifier
+    ///
+    /// The volume is a value between 0 (mute) and 100 (full volume).
+    /// The default value for the volume is 100.
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param volume Volume of the sound
+    ///
+    /// \see getSource, pause
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourceVolume(const unsigned int source, const float value);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the 3D position of the sound in the audio scene given the OpenAL source identifier
+    ///
+    /// Only sounds with one channel (mono sounds) can be
+    /// spatialized.
+    /// The default position of a sound is (0, 0, 0).
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param x X coordinate of the position of the sound in the scene
+    /// \param y Y coordinate of the position of the sound in the scene
+    /// \param z Z coordinate of the position of the sound in the scene
+    ///
+    /// \see getSource, getPosition
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourcePosition(const unsigned int source, const float x, const float y, const float z);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the 3D position of the sound in the audio scene given the OpenAL source identifier
+    ///
+    /// Only sounds with one channel (mono sounds) can be
+    /// spatialized.
+    /// The default position of a sound is (0, 0, 0).
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param position Position of the sound in the scene
+    ///
+    /// \see getPosition
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourcePosition(const unsigned int source, const Vector3f& position);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Make a sound's position relative to the listener or absolute given the OpenAL source identifier
+    ///
+    /// Making a sound relative to the listener will ensure that it will always
+    /// be played the same way regardless of the position of the listener.
+    /// This can be useful for non-spatialized sounds, sounds that are
+    /// produced by the listener, or sounds attached to it.
+    /// The default value is false (position is absolute).
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param relative True to set the position relative, false to set it absolute
+    ///
+    /// \see isRelativeToListener
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourceRelativeToListener(const unsigned int source, const bool relative);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the minimum distance of a sound given the OpenAL source identifier
+    ///
+    /// The "minimum distance" of a sound is the maximum
+    /// distance at which it is heard at its maximum volume. Further
+    /// than the minimum distance, it will start to fade out according
+    /// to its attenuation factor. A value of 0 ("inside the head
+    /// of the listener") is an invalid value and is forbidden.
+    /// The default value of the minimum distance is 1.
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param distance New minimum distance of the sound
+    ///
+    /// \see getMinDistance, setAttenuation
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourceMinDistance(const unsigned int source, float distance);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the attenuation factor of a sound given the OpenAL source identifier
+    ///
+    /// The attenuation is a multiplicative factor which makes
+    /// the sound more or less loud according to its distance
+    /// from the listener. An attenuation of 0 will produce a
+    /// non-attenuated sound, i.e. its volume will always be the same
+    /// whether it is heard from near or from far. On the other hand,
+    /// an attenuation value such as 100 will make the sound fade out
+    /// very quickly as it gets further from the listener.
+    /// The default value of the attenuation is 1.
+    ///
+    /// \param source Source identifier of the OpenAL resource
+    /// \param attenuation New attenuation factor of the sound
+    ///
+    /// \see getAttenuation, setMinDistance
+    ///
+    ////////////////////////////////////////////////////////////
+    static void setSourceAttenuation(const unsigned int source, float attenuation);
 
 protected:
 

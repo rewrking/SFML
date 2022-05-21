@@ -177,7 +177,7 @@ void RenderTarget::clear(const Color& color)
         applyTexture(NULL);
 
         glCheck(glClearColor(color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f));
-        glCheck(glClear(GL_COLOR_BUFFER_BIT));
+        glCheck(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 }
 
@@ -336,6 +336,84 @@ void RenderTarget::draw(const Vertex* vertices, std::size_t vertexCount,
             const char* data = reinterpret_cast<const char*>(m_cache.vertexCache);
 
             glCheck(glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), data + 12));
+        }
+
+        drawPrimitives(type, 0, vertexCount);
+        cleanupDraw(states);
+
+        // Update the cache
+        m_cache.useVertexCache = useVertexCache;
+        m_cache.texCoordsArrayEnabled = enableTexCoordsArray;
+    }
+}
+
+////////////////////////////////////////////////////////////
+void RenderTarget::draw(const Vertex3D* vertices, std::size_t vertexCount,
+                        PrimitiveType type, const RenderStates& states)
+{
+    // Nothing to draw?
+    if (!vertices || (vertexCount == 0))
+        return;
+
+    // GL_QUADS is unavailable on OpenGL ES
+    #ifdef SFML_OPENGL_ES
+        if (type == Quads)
+        {
+            err() << "sf::Quads primitive type is not supported on OpenGL ES platforms, drawing skipped" << std::endl;
+            return;
+        }
+    #endif
+
+    if (RenderTargetImpl::isActive(m_id) || setActive(true))
+    {
+        // Check if the vertex count is low enough so that we can pre-transform them
+        bool useVertexCache = (vertexCount <= StatesCache::VertexCacheSize);
+
+        if (useVertexCache)
+        {
+            // Pre-transform the vertices and store them into the vertex cache
+            for (std::size_t i = 0; i < vertexCount; ++i)
+            {
+                Vertex3D& vertex = m_cache.vertex3DCache[i];
+                vertex.position = states.transform * vertices[i].position;
+                vertex.color = vertices[i].color;
+                vertex.texCoords = vertices[i].texCoords;
+            }
+        }
+
+        setupDraw(useVertexCache, states);
+
+        // Check if texture coordinates array is needed, and update client state accordingly
+        bool enableTexCoordsArray = (states.texture || states.shader);
+        if (!m_cache.enable || (enableTexCoordsArray != m_cache.texCoordsArrayEnabled))
+        {
+            if (enableTexCoordsArray)
+                glCheck(glEnableClientState(GL_TEXTURE_COORD_ARRAY));
+            else
+                glCheck(glDisableClientState(GL_TEXTURE_COORD_ARRAY));
+        }
+
+        // If we switch between non-cache and cache mode or enable texture
+        // coordinates we need to set up the pointers to the vertices' components
+        if (!m_cache.enable || !useVertexCache || !m_cache.useVertexCache)
+        {
+            const char* data = reinterpret_cast<const char*>(vertices);
+
+            // If we pre-transform the vertices, we must use our internal vertex cache
+            if (useVertexCache)
+                data = reinterpret_cast<const char*>(m_cache.vertex3DCache);
+
+            glCheck(glVertexPointer(3, GL_FLOAT, sizeof(Vertex3D), data + 0));
+            glCheck(glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex3D), data + 12));
+            if (enableTexCoordsArray)
+                glCheck(glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex3D), data + 16));
+        }
+        else if (enableTexCoordsArray && !m_cache.texCoordsArrayEnabled)
+        {
+            // If we enter this block, we are already using our internal vertex cache
+            const char* data = reinterpret_cast<const char*>(m_cache.vertex3DCache);
+
+            glCheck(glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex3D), data + 16));
         }
 
         drawPrimitives(type, 0, vertexCount);
@@ -601,12 +679,20 @@ void RenderTarget::applyCurrentView()
 
     // Set the projection matrix
     glCheck(glMatrixMode(GL_PROJECTION));
-    glCheck(glLoadMatrixf(m_view.getTransform().getMatrix()));
+    glCheck(glLoadMatrixf(m_view.getTransform().getMatrix().data()));
 
     // Go back to model-view mode
     glCheck(glMatrixMode(GL_MODELVIEW));
 
     m_cache.viewChanged = false;
+}
+
+
+////////////////////////////////////////////////////////////
+void RenderTarget::applyPointSize(const float pointSize)
+{
+    glCheck(glPointSize(pointSize));
+    m_cache.lastPointSize = pointSize;
 }
 
 
@@ -673,7 +759,7 @@ void RenderTarget::applyTransform(const Transform& transform)
     if (transform == Transform::Identity)
         glCheck(glLoadIdentity());
     else
-        glCheck(glLoadMatrixf(transform.getMatrix()));
+        glCheck(glLoadMatrixf(transform.getMatrix().data()));
 }
 
 
@@ -724,6 +810,10 @@ void RenderTarget::setupDraw(bool useVertexCache, const RenderStates& states)
     // Apply the view
     if (!m_cache.enable || m_cache.viewChanged)
         applyCurrentView();
+
+    // Apply the point size
+    if (!m_cache.enable || (states.pointSize != m_cache.lastPointSize))
+        applyPointSize(states.pointSize);
 
     // Apply the blend mode
     if (!m_cache.enable || (states.blendMode != m_cache.lastBlendMode))

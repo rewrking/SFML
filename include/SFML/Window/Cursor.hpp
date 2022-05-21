@@ -37,6 +37,12 @@ namespace sf
 namespace priv
 {
     class CursorImpl;
+    class WindowImpl;
+    class WindowImplWin32;
+    class WindowImplX11;
+    class WindowImplCocoa;
+    class WindowImplUIKit;
+    class WindowImplAndroid;
 }
 
 ////////////////////////////////////////////////////////////
@@ -180,7 +186,12 @@ public:
 
 private:
 
-    friend class WindowBase;
+    friend class priv::WindowImpl;
+    friend class priv::WindowImplWin32;
+    friend class priv::WindowImplX11;
+    friend class priv::WindowImplCocoa;
+    friend class priv::WindowImplUIKit;
+    friend class priv::WindowImplAndroid;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get access to the underlying implementation

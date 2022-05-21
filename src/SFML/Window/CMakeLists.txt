@@ -51,7 +51,7 @@ set(SRC
     ${INCROOT}/WindowBase.hpp
     ${INCROOT}/WindowHandle.hpp
     ${SRCROOT}/WindowImpl.cpp
-    ${SRCROOT}/WindowImpl.hpp
+    ${INCROOT}/WindowImpl.hpp
     ${INCROOT}/WindowStyle.hpp
 )
 source_group("" FILES ${SRC})

@@ -112,6 +112,20 @@ public:
     ////////////////////////////////////////////////////////////
     virtual void create(VideoMode mode, const String& title, Uint32 style = Style::Default);
 
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Create (or recreate) the window
+    ///
+    /// If the window was already created, it closes it first.
+    /// If \a style contains Style::Fullscreen, then \a mode
+    /// must be a valid video mode.
+    ///
+    /// \param impl The Custom Window implementation to use (GLFW/SDL, etc.)
+    /// \param isFullscreen true if fullscreen
+    ///
+    ////////////////////////////////////////////////////////////
+    virtual void createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen);
+
     ////////////////////////////////////////////////////////////
     /// \brief Create (or recreate) the window from an existing control
     ///
@@ -394,6 +408,7 @@ public:
     ////////////////////////////////////////////////////////////
     WindowHandle getSystemHandle() const;
 
+#ifndef SFML_CUSTOM_WINDOW
     ////////////////////////////////////////////////////////////
     /// \brief Create a Vulkan rendering surface
     ///
@@ -405,6 +420,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     bool createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator = 0);
+#endif
 
 protected:
 

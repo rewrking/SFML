@@ -222,14 +222,17 @@ Int64 Music::onLoop()
     // Called by underlying SoundStream so we can determine where to loop.
     Lock lock(m_mutex);
     Uint64 currentOffset = m_file.getSampleOffset();
-    if (getLoop() && (m_loopSpan.length != 0) && (currentOffset == m_loopSpan.offset + m_loopSpan.length))
+    Uint64 loopEnd = m_loopSpan.offset + m_loopSpan.length;
+
+    bool loop = getLoop();
+    if (loop && (m_loopSpan.length != 0) && (currentOffset == loopEnd))
     {
         // Looping is enabled, and either we're at the loop end, or we're at the EOF
         // when it's equivalent to the loop end (loop end takes priority). Send us to loop begin
         m_file.seek(m_loopSpan.offset);
         return static_cast<Int64>(m_file.getSampleOffset());
     }
-    else if (getLoop() && (currentOffset >= m_file.getSampleCount()))
+    else if (loop && (currentOffset >= m_file.getSampleCount()))
     {
         // If we're at the EOF, reset to 0
         m_file.seek(0);

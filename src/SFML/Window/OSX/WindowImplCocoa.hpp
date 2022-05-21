@@ -337,7 +337,7 @@ public:
     /// \param cursor Native system cursor type to display
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setMouseCursor(const CursorImpl& cursor);
+    virtual void setMouseCursor(const Cursor& cursor);
 
     ////////////////////////////////////////////////////////////
     /// \brief Enable or disable automatic key-repeat
@@ -390,5 +390,6 @@ private:
         #pragma GCC diagnostic pop
     #endif
 #endif
+
 
 #endif // SFML_WINDOWIMPLCOCOA_HPP

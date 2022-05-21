@@ -116,6 +116,7 @@ public:
     Transform      transform; //!< Transform
     const Texture* texture;   //!< Texture
     const Shader*  shader;    //!< Shader
+    float          pointSize;
 };
 
 } // namespace sf

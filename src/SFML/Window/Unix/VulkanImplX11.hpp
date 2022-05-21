@@ -81,6 +81,7 @@ public:
     ////////////////////////////////////////////////////////////
     static const std::vector<const char*>& getGraphicsRequiredInstanceExtensions();
 
+#ifndef SFML_CUSTOM_WINDOW
     ////////////////////////////////////////////////////////////
     /// \brief Create a Vulkan rendering surface
     ///
@@ -93,6 +94,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     static bool createVulkanSurface(const VkInstance& instance, WindowHandle windowHandle, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator);
+#endif
 };
 
 } // namespace priv

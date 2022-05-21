@@ -124,7 +124,7 @@ void WindowImplDRM::setMouseCursorGrabbed(bool /*grabbed*/)
 }
 
 ////////////////////////////////////////////////////////////
-void WindowImplDRM::setMouseCursor(const CursorImpl& /*cursor*/)
+void WindowImplDRM::setMouseCursor(const Cursor& /*cursor*/)
 {
     // TODO: not implemented
 }

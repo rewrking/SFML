@@ -33,6 +33,7 @@
 #include <SFML/System/Err.hpp>
 #include <sstream>
 #include <vector>
+#include <cassert>
 
 // We check for this definition in order to avoid multiple definitions of GLAD
 // entities during unity builds of SFML.
@@ -602,7 +603,11 @@ void WglContext::createSurface(HWND window, unsigned int bitsPerPixel)
     m_deviceContext = GetDC(window);
 
     // Set the pixel format of the device context
+#ifndef SFML_CUSTOM_WINDOW
     setDevicePixelFormat(bitsPerPixel);
+#else
+    (void)bitsPerPixel;
+#endif
 
     // Update context settings from the selected pixel format
     updateSettingsFromPixelFormat();

@@ -197,6 +197,12 @@ SoundSource& SoundSource::operator =(const SoundSource& right)
 
 
 ////////////////////////////////////////////////////////////
+unsigned int SoundSource::getSource() const noexcept
+{
+    return m_source;
+}
+
+////////////////////////////////////////////////////////////
 SoundSource::Status SoundSource::getStatus() const
 {
     ALint status;
@@ -211,6 +217,54 @@ SoundSource::Status SoundSource::getStatus() const
     }
 
     return Stopped;
+}
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourcePitch(const unsigned int source, const float pitch)
+{
+    alCheck(alSourcef(source, AL_PITCH, pitch));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourceVolume(const unsigned int source, const float value)
+{
+    alCheck(alSourcef(source, AL_GAIN, value));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourcePosition(const unsigned int source, const float x, const float y, const float z)
+{
+    alCheck(alSource3f(source, AL_POSITION, x, y, z));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourcePosition(const unsigned int source, const Vector3f& position)
+{
+    alCheck(alSource3f(source, AL_POSITION, position.x, position.y, position.z));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourceRelativeToListener(const unsigned int source, const bool relative)
+{
+    alCheck(alSourcei(source, AL_SOURCE_RELATIVE, relative));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourceMinDistance(const unsigned int source, float distance)
+{
+    alCheck(alSourcef(source, AL_REFERENCE_DISTANCE, distance));
+}
+
+
+////////////////////////////////////////////////////////////
+void SoundSource::setSourceAttenuation(const unsigned int source, float attenuation)
+{
+    alCheck(alSourcef(source, AL_ROLLOFF_FACTOR, attenuation));
 }
 
 } // namespace sf

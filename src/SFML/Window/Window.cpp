@@ -127,6 +127,38 @@ void Window::create(VideoMode mode, const String& title, Uint32 style, const Con
 
 
 ////////////////////////////////////////////////////////////
+void Window::createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen, VideoMode mode, const ContextSettings& settings)
+{
+    // Destroy the previous window implementation
+    close();
+
+    // Fullscreen style requires some tests
+    if (isFullscreen)
+    {
+        // Make sure there's not already a fullscreen window (only one is allowed)
+        if (getFullscreenWindow())
+        {
+            err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
+        }
+        else
+        {
+            // Update the fullscreen window
+            setFullscreenWindow(this);
+        }
+    }
+
+    // Set the window implementation
+    m_impl = impl;
+
+    // Recreate the context
+    m_context = priv::GlContext::create(settings, m_impl, mode.bitsPerPixel);
+
+    // Perform common initializations
+    initialize();
+}
+
+
+////////////////////////////////////////////////////////////
 void Window::create(WindowHandle handle)
 {
     Window::create(handle, ContextSettings());
@@ -154,8 +186,11 @@ void Window::create(WindowHandle handle, const ContextSettings& settings)
 void Window::close()
 {
     // Delete the context
-    delete m_context;
-    m_context = NULL;
+    if (m_context)
+    {
+        delete m_context;
+        m_context = NULL;
+    }
 
     // Close the base window
     WindowBase::close();

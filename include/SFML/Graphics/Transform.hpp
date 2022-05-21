@@ -28,9 +28,12 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include <array>
+
 #include <SFML/Graphics/Export.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/System/Vector3.hpp>
 
 
 namespace sf
@@ -41,6 +44,8 @@ namespace sf
 ////////////////////////////////////////////////////////////
 class SFML_GRAPHICS_API Transform
 {
+    using Matrix4x4 = std::array<float, 16>;
+
 public:
 
     ////////////////////////////////////////////////////////////
@@ -66,8 +71,11 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     Transform(float a00, float a01, float a02,
-              float a10, float a11, float a12,
-              float a20, float a21, float a22);
+		float a10, float a11, float a12,
+		float a20, float a21, float a22);
+
+    void setMatrix(const Matrix4x4& inValue);
+    void setMatrix(const float* inValue);
 
     ////////////////////////////////////////////////////////////
     /// \brief Return the transform as a 4x4 matrix
@@ -84,7 +92,7 @@ public:
     /// \return Pointer to a 4x4 matrix
     ///
     ////////////////////////////////////////////////////////////
-    const float* getMatrix() const;
+    const Matrix4x4& getMatrix() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Return the inverse of the transform
@@ -114,6 +122,8 @@ public:
     ////////////////////////////////////////////////////////////
     Vector2f transformPoint(float x, float y) const;
 
+    Vector3f transformPoint(float x, float y, float z) const;
+
     ////////////////////////////////////////////////////////////
     /// \brief Transform a 2D point
     ///
@@ -129,6 +139,8 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     Vector2f transformPoint(const Vector2f& point) const;
+
+    Vector3f transformPoint(const Vector3f& point) const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Transform a rectangle
@@ -204,6 +216,27 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     Transform& translate(const Vector2f& offset);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Floor the translation position to the nearest 0
+    ///
+    /// Useful for pixelated graphics that need to store a transform,
+    /// but also need to draw to the nearest whole pixel value,
+    /// when the drawing canvas could be scaled up
+    ///
+    /// This function returns a reference to *this, so that calls
+    /// can be chained.
+    /// \code
+    /// sf::Transform transform;
+    /// transform.translate(sf::Vector2f(100, 200)).floorTranslation();
+    /// \endcode
+    ///
+    /// \return Reference to *this
+    ///
+    /// \see translate
+    ///
+    ////////////////////////////////////////////////////////////
+    Transform& floorTranslation();
 
     ////////////////////////////////////////////////////////////
     /// \brief Combine the current transform with a rotation
@@ -376,7 +409,7 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    float m_matrix[16]; //!< 4x4 matrix defining the transformation
+    Matrix4x4 m_matrix; //!< 4x4 matrix defining the transformation
 };
 
 ////////////////////////////////////////////////////////////
@@ -420,6 +453,8 @@ SFML_GRAPHICS_API Transform& operator *=(Transform& left, const Transform& right
 ///
 ////////////////////////////////////////////////////////////
 SFML_GRAPHICS_API Vector2f operator *(const Transform& left, const Vector2f& right);
+
+SFML_GRAPHICS_API Vector3f operator *(const Transform& left, const Vector3f& right);
 
 ////////////////////////////////////////////////////////////
 /// \relates sf::Transform

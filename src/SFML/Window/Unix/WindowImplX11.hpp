@@ -162,7 +162,7 @@ public:
     /// \param cursor Native system cursor type to display
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setMouseCursor(const CursorImpl& cursor);
+    virtual void setMouseCursor(const Cursor& cursor);
 
     ////////////////////////////////////////////////////////////
     /// \brief Enable or disable automatic key-repeat
@@ -266,7 +266,7 @@ private:
     bool processEvent(XEvent& windowEvent);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Check if a valid version of XRandR extension is present 
+    /// \brief Check if a valid version of XRandR extension is present
     ///
     /// \param xRandRMajor XRandR major version
     /// \param xRandRMinor XRandR minor version

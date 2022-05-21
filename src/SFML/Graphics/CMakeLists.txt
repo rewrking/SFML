@@ -48,6 +48,8 @@ set(SRC
     ${INCROOT}/View.hpp
     ${SRCROOT}/Vertex.cpp
     ${INCROOT}/Vertex.hpp
+    ${SRCROOT}/Vertex3D.cpp
+    ${INCROOT}/Vertex3D.hpp
 )
 source_group("" FILES ${SRC})
 

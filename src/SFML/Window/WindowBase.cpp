@@ -126,6 +126,35 @@ void WindowBase::create(VideoMode mode, const String& title, Uint32 style)
 
 
 ////////////////////////////////////////////////////////////
+void WindowBase::createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen)
+{
+    // Destroy the previous window implementation
+    close();
+
+    // Fullscreen style requires some tests
+    if (isFullscreen)
+    {
+        // Make sure there's not already a fullscreen window (only one is allowed)
+        if (getFullscreenWindow())
+        {
+            err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
+        }
+        else
+        {
+            // Update the fullscreen window
+            setFullscreenWindow(this);
+        }
+    }
+
+    // Set the window implementation
+    m_impl = impl;
+
+    // Perform common initializations
+    initialize();
+}
+
+
+////////////////////////////////////////////////////////////
 void WindowBase::create(WindowHandle handle)
 {
     // Destroy the previous window implementation
@@ -143,8 +172,11 @@ void WindowBase::create(WindowHandle handle)
 void WindowBase::close()
 {
     // Delete the window implementation
-    delete m_impl;
-    m_impl = NULL;
+    if (m_impl)
+    {
+        delete m_impl;
+        m_impl = NULL;
+    }
 
     // Update the fullscreen window
     if (this == getFullscreenWindow())
@@ -270,7 +302,7 @@ void WindowBase::setMouseCursorGrabbed(bool grabbed)
 void WindowBase::setMouseCursor(const Cursor& cursor)
 {
     if (m_impl)
-        m_impl->setMouseCursor(cursor.getImpl());
+        m_impl->setMouseCursor(cursor);
 }
 
 
@@ -313,10 +345,12 @@ WindowHandle WindowBase::getSystemHandle() const
 
 
 ////////////////////////////////////////////////////////////
+#ifndef SFML_CUSTOM_WINDOW
 bool WindowBase::createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator)
 {
     return m_impl ? m_impl->createVulkanSurface(instance, surface, allocator) : false;
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////

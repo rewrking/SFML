@@ -187,7 +187,7 @@ void WindowImplAndroid::setMouseCursorGrabbed(bool /* grabbed */)
 
 
 ////////////////////////////////////////////////////////////
-void WindowImplAndroid::setMouseCursor(const CursorImpl& /* cursor */)
+void WindowImplAndroid::setMouseCursor(const Cursor& /* cursor */)
 {
     // Not applicable
 }
