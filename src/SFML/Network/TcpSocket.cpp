@@ -245,11 +245,15 @@ Socket::Status TcpSocket::send(const void* data, std::size_t size, std::size_t& 
     int result = 0;
     for (sent = 0; sent < size; sent += static_cast<std::size_t>(result))
     {
+#if defined(__GNUC__)
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
         // Send a chunk of data
         result = static_cast<int>(::send(getHandle(), static_cast<const char*>(data) + sent, static_cast<priv::SocketImpl::Size>(size - sent), flags));
+#if defined(__GNUC__)
         #pragma GCC diagnostic pop
+#endif
 
         // Check for errors
         if (result < 0)
@@ -330,25 +334,33 @@ Socket::Status TcpSocket::send(Packet& packet)
     std::vector<char> blockToSend(sizeof(packetSize) + size);
 
     // Copy the packet size and data into the block to send
+#if defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wnull-dereference" // False positive.
+#endif
     std::memcpy(&blockToSend[0], &packetSize, sizeof(packetSize));
+#if defined(__GNUC__)
     #pragma GCC diagnostic pop
+#endif
     if (size > 0)
         std::memcpy(&blockToSend[0] + sizeof(packetSize), data, size);
 
     // These warnings are ignored here for portability, as even on Windows the
     // signature of `send` might change depending on whether Win32 or MinGW is
     // being used.
+#if defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wuseless-cast"
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
     // Send the data block
     std::size_t sent;
     Status status = send(&blockToSend[0] + packet.m_sendPos, static_cast<priv::SocketImpl::Size>(blockToSend.size() - packet.m_sendPos), sent);
+#if defined(__GNUC__)
     #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
+#endif
 
     // In the case of a partial send, record the location to resume from
     if (status == Partial)
