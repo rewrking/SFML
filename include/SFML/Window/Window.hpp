@@ -155,7 +155,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     using WindowBase::createWithCustomImpl;
-    virtual void createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen, VideoMode mode = VideoMode(), const ContextSettings& settings = ContextSettings());
+    virtual void createWithCustomImpl(priv::WindowImpl* impl, VideoMode mode = VideoMode(), const ContextSettings& settings = ContextSettings());
 
     ////////////////////////////////////////////////////////////
     /// \brief Create (or recreate) the window from an existing control

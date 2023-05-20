@@ -126,31 +126,41 @@ void WindowBase::create(VideoMode mode, const String& title, Uint32 style)
 
 
 ////////////////////////////////////////////////////////////
-void WindowBase::createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen)
+void WindowBase::createWithCustomImpl(priv::WindowImpl* impl)
 {
     // Destroy the previous window implementation
     close();
 
     // Fullscreen style requires some tests
-    if (isFullscreen)
-    {
-        // Make sure there's not already a fullscreen window (only one is allowed)
-        if (getFullscreenWindow())
-        {
-            err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
-        }
-        else
-        {
-            // Update the fullscreen window
-            setFullscreenWindow(this);
-        }
-    }
+    // if (isFullscreen)
+    // {
+    //     // Make sure there's not already a fullscreen window (only one is allowed)
+    //     if (getFullscreenWindow())
+    //     {
+    //         err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
+    //     }
+    //     else
+    //     {
+    //         // Update the fullscreen window
+    //         setFullscreenWindow(this);
+    //     }
+    // }
 
     // Set the window implementation
     m_impl = impl;
 
     // Perform common initializations
-    initialize();
+
+    // Setup default behaviors (to get a consistent behavior across different implementations)
+    // setVisible(true);
+    setMouseCursorVisible(true);
+    setKeyRepeatEnabled(true);
+
+    // Get and cache the initial size of the window
+    m_size = m_impl->getSize();
+
+    // Notify the derived class
+    onCreate();
 }
 
 

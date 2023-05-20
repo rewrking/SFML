@@ -127,25 +127,10 @@ void Window::create(VideoMode mode, const String& title, Uint32 style, const Con
 
 
 ////////////////////////////////////////////////////////////
-void Window::createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen, VideoMode mode, const ContextSettings& settings)
+void Window::createWithCustomImpl(priv::WindowImpl* impl, VideoMode mode, const ContextSettings& settings)
 {
     // Destroy the previous window implementation
     close();
-
-    // Fullscreen style requires some tests
-    if (isFullscreen)
-    {
-        // Make sure there's not already a fullscreen window (only one is allowed)
-        if (getFullscreenWindow())
-        {
-            err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
-        }
-        else
-        {
-            // Update the fullscreen window
-            setFullscreenWindow(this);
-        }
-    }
 
     // Set the window implementation
     m_impl = impl;
@@ -154,7 +139,26 @@ void Window::createWithCustomImpl(priv::WindowImpl* impl, bool isFullscreen, Vid
     m_context = priv::GlContext::create(settings, m_impl, mode.bitsPerPixel);
 
     // Perform common initializations
-    initialize();
+
+	// Setup default behaviors (to get a consistent behavior across different implementations)
+	setVerticalSyncEnabled(false);
+	setFramerateLimit(0);
+
+	// Reset frame time
+	m_clock.restart();
+
+	// Activate the window
+	// setActive();
+
+	// setVisible(true);
+	setMouseCursorVisible(true);
+	setKeyRepeatEnabled(true);
+
+	// Get and cache the initial size of the window
+	m_size = m_impl->getSize();
+
+	// Notify the derived class
+	onCreate();
 }
 
 
