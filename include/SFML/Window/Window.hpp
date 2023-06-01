@@ -297,8 +297,8 @@ private:
     // Member data
     ////////////////////////////////////////////////////////////
     priv::GlContext*  m_context;        //!< Platform-specific implementation of the OpenGL context
-    Clock             m_clock;          //!< Clock for measuring the elapsed time between frames
-    Time              m_frameTimeLimit; //!< Current framerate limit
+    // Clock             m_clock;          //!< Clock for measuring the elapsed time between frames
+    // Time              m_frameTimeLimit; //!< Current framerate limit
 };
 
 } // namespace sf

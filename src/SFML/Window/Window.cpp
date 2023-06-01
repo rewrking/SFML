@@ -36,8 +36,8 @@ namespace sf
 {
 ////////////////////////////////////////////////////////////
 Window::Window() :
-m_context       (NULL),
-m_frameTimeLimit(Time::Zero)
+m_context       (NULL)
+// m_frameTimeLimit(Time::Zero)
 {
 
 }
@@ -45,8 +45,8 @@ m_frameTimeLimit(Time::Zero)
 
 ////////////////////////////////////////////////////////////
 Window::Window(VideoMode mode, const String& title, Uint32 style, const ContextSettings& settings) :
-m_context       (NULL),
-m_frameTimeLimit(Time::Zero)
+m_context       (NULL)
+// m_frameTimeLimit(Time::Zero)
 {
     Window::create(mode, title, style, settings);
 }
@@ -54,8 +54,8 @@ m_frameTimeLimit(Time::Zero)
 
 ////////////////////////////////////////////////////////////
 Window::Window(WindowHandle handle, const ContextSettings& settings) :
-m_context       (NULL),
-m_frameTimeLimit(Time::Zero)
+m_context       (NULL)
+// m_frameTimeLimit(Time::Zero)
 {
     Window::create(handle, settings);
 }
@@ -145,7 +145,7 @@ void Window::createWithCustomImpl(priv::WindowImpl* impl, VideoMode mode, const 
 	setFramerateLimit(0);
 
 	// Reset frame time
-	m_clock.restart();
+	// m_clock.restart();
 
 	// Activate the window
 	// setActive();
@@ -221,10 +221,11 @@ void Window::setVerticalSyncEnabled(bool enabled)
 ////////////////////////////////////////////////////////////
 void Window::setFramerateLimit(unsigned int limit)
 {
-    if (limit > 0)
-        m_frameTimeLimit = seconds(1.f / static_cast<float>(limit));
-    else
-        m_frameTimeLimit = Time::Zero;
+    static_cast<void>(limit);
+    // if (limit > 0)
+    //     m_frameTimeLimit = seconds(1.f / static_cast<float>(limit));
+    // else
+    //     m_frameTimeLimit = Time::Zero;
 }
 
 
@@ -258,11 +259,11 @@ void Window::display()
         m_context->display();
 
     // Limit the framerate if needed
-    if (m_frameTimeLimit != Time::Zero)
-    {
-        sleep(m_frameTimeLimit - m_clock.getElapsedTime());
-        m_clock.restart();
-    }
+    // if (m_frameTimeLimit != Time::Zero)
+    // {
+    //     sleep(m_frameTimeLimit - m_clock.getElapsedTime());
+    //     m_clock.restart();
+    // }
 }
 
 
@@ -271,10 +272,10 @@ void Window::initialize()
 {
     // Setup default behaviors (to get a consistent behavior across different implementations)
     setVerticalSyncEnabled(false);
-    setFramerateLimit(0);
+    // setFramerateLimit(0);
 
     // Reset frame time
-    m_clock.restart();
+    // m_clock.restart();
 
     // Activate the window
     setActive();
